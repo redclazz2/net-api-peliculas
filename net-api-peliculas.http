@@ -1,0 +1,6 @@
+@net_api_peliculas_HostAddress = http://localhost:5117
+
+GET {{net_api_peliculas_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
