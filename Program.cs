@@ -1,5 +1,5 @@
+using Microsoft.EntityFrameworkCore;
 using net_api_peliculas;
-using net_api_peliculas.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +10,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var allowedOrigins = builder.Configuration.GetValue<string>("AllowedOrigins")!.Split(",");
+
+builder.Services.AddCors(opciones =>
+{
+    opciones.AddDefaultPolicy(opcionesCORS =>
+    {
+        opcionesCORS.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader();
+    });
+});
+
 builder.Services.AddOutputCache(
     opciones =>
     {
@@ -17,7 +27,9 @@ builder.Services.AddOutputCache(
     }
 );
 
-builder.Services.AddSingleton<IRepositorio,TestRepo>();
+builder.Services.AddDbContext<ApplicationDbContext>(
+    opciones => opciones.UseSqlServer("name=DefaultConnection")
+);
 
 var app = builder.Build();
 
@@ -30,6 +42,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors();
+
 app.UseOutputCache();
 
 app.UseAuthorization();
@@ -37,3 +51,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+//Cadena de conexion a la bd: Server=localhost;Database=master;Trusted_Connection=True;

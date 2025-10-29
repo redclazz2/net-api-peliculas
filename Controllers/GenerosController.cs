@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using net_api_peliculas.Entidades;
-using net_api_peliculas.Interfaces;
 
 namespace net_api_peliculas.Controllers
 {
@@ -9,73 +8,49 @@ namespace net_api_peliculas.Controllers
     [ApiController]
     public class GenerosController : Controller
     {
-        public IRepositorio TestRepo { get; }
-        public GenerosController(IRepositorio testRepo)
+        public IOutputCacheStore OutputCacheStore { get; }
+        private const string CacheTag = "Genero";
+
+        public GenerosController(
+            IOutputCacheStore outputCacheStore
+        )
         {
-            TestRepo = testRepo;
+            OutputCacheStore = outputCacheStore;
         }
 
         [HttpGet]
-        public List<Genero> GetGeneros()
+        [OutputCache(Tags = [CacheTag])]
+        public ActionResult<List<Genero>> GetGeneros()
         {
-            return [];
+            return new List<Genero>
+            {
+                new() {Id = 1, Nombre = "Comedia"},
+                new() {Id = 2, Nombre = "Acción"}
+            };
         }
 
-        [HttpGet("{id:int}")]
-        [OutputCache]
-        public async Task<ActionResult<Genero>?> GetGenero(int id)
+        [HttpGet("{id}")]
+        public ActionResult<Genero> GetGenero(int id)
         {
-            List<Genero> generos = [];
-            generos.Add(new Genero
-            {
-                Nombre = "Acción"
-            });
-
-            generos.Add(new Genero
-            {
-                Nombre = "Comedia"
-            });
-
-            if (id < 0 || id > 1)
-            {
-                return NotFound();
-            }
-
-            TestRepo repo = new();
-
-            return await repo.GetGenero();
-        }
-
-        [HttpGet("{nombre}")]
-        public Genero? GetGenero(string id)
-        {
-            List<Genero> generos = [];
-            generos.Add(new Genero
-            {
-                Nombre = "Acción"
-            });
-
-            generos.Add(new Genero
-            {
-                Nombre = "Comedia"
-            });
-
-            return generos[int.Parse(id)];
+            throw new NotImplementedException();            
         }
 
         [HttpPost]
-        public ActionResult PostGeneros([FromBody]Genero genero)
+        public async Task<ActionResult> Crear([FromBody] Genero genero)
         {
-            var existe = TestRepo.Existe(genero.Nombre);
+            throw new NotImplementedException();
+        }
 
-            if (existe)
-            {
-                return BadRequest();
-            }
+        [HttpPut]
+        public void Put()
+        {
+            throw new NotImplementedException();
+        }
 
-            TestRepo.Crear(genero);
-
-            return Ok();
+        [HttpDelete]
+        public void Delete()
+        {
+            throw new NotImplementedException();
         }
     }
 }
