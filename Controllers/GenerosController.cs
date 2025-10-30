@@ -10,11 +10,14 @@ namespace net_api_peliculas.Controllers
     {
         public IOutputCacheStore OutputCacheStore { get; }
         private const string CacheTag = "Genero";
+        public ApplicationDbContext context { get; }
 
         public GenerosController(
-            IOutputCacheStore outputCacheStore
+            IOutputCacheStore outputCacheStore,
+            ApplicationDbContext applicationDbContext
         )
         {
+            context = applicationDbContext;
             OutputCacheStore = outputCacheStore;
         }
 
@@ -29,16 +32,23 @@ namespace net_api_peliculas.Controllers
             };
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Genero> GetGenero(int id)
+        [HttpGet("{id}", Name = "ObtenerGeneroPorId")]
+        public ActionResult<Genero?> GetGenero(int id)
         {
-            throw new NotImplementedException();            
+            var result = context.Generos.Where((g) => g.Id == id).FirstOrDefault();
+            if (result == null)
+                return NotFound();
+
+            return result;
         }
 
         [HttpPost]
         public async Task<ActionResult> Crear([FromBody] Genero genero)
         {
-            throw new NotImplementedException();
+            context.Add(genero);
+            await context.SaveChangesAsync();
+
+            return CreatedAtRoute("ObtenerGeneroPorId", new {id = genero.Id}, genero);
         }
 
         [HttpPut]
