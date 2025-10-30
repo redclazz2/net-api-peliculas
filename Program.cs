@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using net_api_peliculas;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +17,9 @@ builder.Services.AddCors(opciones =>
 {
     opciones.AddDefaultPolicy(opcionesCORS =>
     {
-        opcionesCORS.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader();
+        opcionesCORS.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader().WithExposedHeaders(
+            "cantidad-total-registros"
+        );
     });
 });
 
@@ -30,6 +33,8 @@ builder.Services.AddOutputCache(
 builder.Services.AddDbContext<ApplicationDbContext>(
     opciones => opciones.UseSqlServer("name=DefaultConnection")
 );
+
+builder.Services.AddAutoMapper(cfg => { },typeof(Program));
 
 var app = builder.Build();
 
