@@ -8,7 +8,7 @@ namespace net_api_peliculas.Utilidades
 {
     public static class HTTPContentExtensions
     {
-        public async static Task InsertarParametrosPaginacionEnCabecera<T>(this HttpContext httpContext, IQueryable<T> queryable){
+        public async static Task InsertarTotalRegistrosEnCabecera<T>(this HttpContext httpContext, IQueryable<T> queryable){
             if (httpContext is null)
             {
                 throw new ArgumentException();

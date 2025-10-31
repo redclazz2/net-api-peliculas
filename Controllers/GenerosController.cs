@@ -35,7 +35,7 @@ namespace net_api_peliculas.Controllers
         public async Task<ActionResult<List<GeneroDTO>>> GetGeneros([FromQuery] PaginacionDTO paginacion)
         {
             var queryable = context.Generos;
-            await HttpContext.InsertarParametrosPaginacionEnCabecera(queryable);
+            await HttpContext.InsertarTotalRegistrosEnCabecera(queryable);
             return await queryable.
             OrderBy(g => g.Nombre).
             Paginar(paginacion).

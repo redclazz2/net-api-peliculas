@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using net_api_peliculas;
+using net_api_peliculas.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var allowedOrigins = builder.Configuration.GetValue<string>("AllowedOrigins")!.Split(",");
+
+builder.Services.AddTransient<IAlmacenadorArchivos, AlmacenadorLocal>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCors(opciones =>
 {
@@ -46,6 +49,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseCors();
 
