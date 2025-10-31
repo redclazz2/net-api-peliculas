@@ -1,15 +1,21 @@
 using AutoMapper;
 using net_api_peliculas.DTO;
 using net_api_peliculas.Entidades;
+using NetTopologySuite.Geometries;
 
 namespace net_api_peliculas.Utilidades
 {
     public class AutoMapperProfiles : Profile
     {
-        public AutoMapperProfiles()
+        public GeometryFactory GeometryFactory { get; }
+
+        public AutoMapperProfiles(
+            GeometryFactory geometryFactory
+        )
         {
             ConfigGeneros();
             ConfigActores();
+            GeometryFactory = geometryFactory;
         }
 
         private void ConfigGeneros()
