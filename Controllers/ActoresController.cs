@@ -11,7 +11,7 @@ using net_api_peliculas.Utilidades;
 namespace net_api_peliculas.Controllers
 {
     [Route("api/actores")]
-    public class ActoresController : Controller
+    public class ActoresController : CustomBaseController
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
@@ -25,7 +25,7 @@ namespace net_api_peliculas.Controllers
             IMapper mapper,
             IOutputCacheStore outputCacheStore,
             IAlmacenadorArchivos almacenadorArchivos
-        )
+        ) : base(context, mapper, outputCacheStore,cacheTag)
         {
             this.context = context;
             this.mapper = mapper;
@@ -35,25 +35,17 @@ namespace net_api_peliculas.Controllers
 
         [HttpGet]
         [OutputCache(Tags = [cacheTag])]
-        public async Task<ActionResult<List<ActorDTO>>> ObtenerTodosPaginado ([FromQuery] PaginacionDTO paginacion){
-            var queryable = context.Actores;
-            await HttpContext.InsertarTotalRegistrosEnCabecera(queryable);
-            return await queryable
-                .OrderBy(a => a.Nombre)
-                .Paginar(paginacion)
-                .ProjectTo<ActorDTO>(mapper.ConfigurationProvider).ToListAsync();
+        public async Task<ActionResult<List<ActorDTO>>> ObtenerTodosPaginado([FromQuery] PaginacionDTO paginacion)
+        {
+            return await Get<Actor, ActorDTO>(
+                paginacion, orden: a => a.Nombre
+            );
         }
 
-
         [HttpGet("{id:int}", Name = "ObtenerActorPorId")]
-        public async Task<ActionResult<ActorDTO?>> Get(int id)
+        public async Task<ActionResult<ActorDTO>> Get(int id)
         {
-            var actor = await context.Actores.ProjectTo<ActorDTO>(mapper.ConfigurationProvider).FirstOrDefaultAsync(a => a.Id == id); 
-            
-            if(actor == null)
-                return NotFound();
-
-            return actor;
+            return await Get <Actor,ActorDTO>(id);
         }
 
         [HttpPost]
@@ -96,14 +88,7 @@ namespace net_api_peliculas.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var borrados = await context.Actores.Where(a => a.Id == id).ExecuteDeleteAsync();
-            
-            if (borrados == 0)
-                return NotFound();
-
-            await outputCacheStore.EvictByTagAsync(tag: cacheTag, default);
-            
-            return NoContent();
+            return await Delete<Actor>(id);
         }
     }
 }
