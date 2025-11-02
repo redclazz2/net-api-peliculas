@@ -1,6 +1,8 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using net_api_peliculas;
 using net_api_peliculas.Servicios;
+using net_api_peliculas.Utilidades;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 
@@ -46,10 +48,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 
 //builder.Services.AddAutoMapper(cfg => { },typeof(Program));
 
-builder.Services.AddSingleton(proveedor => new MapperConfiguration(configuraion =>{
-    var geometryFactory = proveedor.GetRequiredKeyedService<GeometryFactory>();
-    configuracion.addprofile
-}));
+builder.Services.AddSingleton(proveedor => new MapperConfiguration(configuration =>{
+    var geometryFactory = proveedor.GetRequiredService<GeometryFactory>();
+    configuration.AddProfile(new AutoMapperProfiles(geometryFactory));
+}).CreateMapper());
 
 var app = builder.Build();
 

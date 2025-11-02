@@ -3,7 +3,7 @@ using NetTopologySuite.Geometries;
 
 namespace net_api_peliculas.Entidades
 {
-    public class Cine
+    public class Cine : IId
     {
         public int Id { get; set; }
         [Required]
