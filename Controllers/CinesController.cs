@@ -36,31 +36,31 @@ namespace net_api_peliculas.Controllers
         }
 
         [HttpGet("{id:int}", Name = "ObtenerCinePorId")]
-        public async Task<ActionResult<ActorDTO>> Get(int id)
+        public async Task<ActionResult<CineDTO>> Get(int id)
         {
-            return await Get<Actor, ActorDTO>(id);
+            return await Get<Cine, CineDTO>(id);
         }
 
         [HttpPost]
-        public async Task<ActionResult<ActorDTO>> Post([FromBody] ActorCreacionDTO actorCreacion)
+        public async Task<ActionResult<CineCreacionDTO>> Post([FromBody] CineCreacionDTO cineCreacion)
         {
-            return await Post<Actor, ActorCreacionDTO, ActorDTO>(
-                actorCreacion, "ObtenerCinePorId"
+            return await Post<Cine, CineCreacionDTO, CineDTO>(
+                cineCreacion, "ObtenerCinePorId"
             );
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, [FromBody] ActorCreacionDTO actorCreacion)
+        public async Task<ActionResult> Put(int id, [FromBody] CineCreacionDTO cinceCreacion)
         {
-            return await Put<Actor, ActorCreacionDTO>(
-                id, actorCreacion
+            return await Put<Cine, CineCreacionDTO>(
+                id, cinceCreacion
             );
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            return await Delete<Actor>(id);
+            return await Delete<Cine>(id);
         }
     }
 }
