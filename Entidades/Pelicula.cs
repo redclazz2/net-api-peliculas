@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace net_api_peliculas.Entidades
 {
-    public class Peliculas : IId
+    public class Pelicula : IId
     {
         public int Id { get; set; }
         [Required]

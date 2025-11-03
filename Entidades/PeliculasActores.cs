@@ -14,6 +14,6 @@ namespace net_api_peliculas.Entidades
         public required string Personaje { get; set; }
         public int Orden { get; set; }
         public Actor Actor { get; set; } = null!;
-        public Peliculas Peliculas { get; set; } = null!;
+        public Pelicula Pelicula { get; set; } = null!;
     }
 }

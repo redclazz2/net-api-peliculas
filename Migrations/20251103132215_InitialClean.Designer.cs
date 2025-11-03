@@ -13,8 +13,8 @@ using net_api_peliculas;
 namespace net_api_peliculas.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251102220716_TablasPeliculas")]
-    partial class TablasPeliculas
+    [Migration("20251103132215_InitialClean")]
+    partial class InitialClean
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,7 +91,7 @@ namespace net_api_peliculas.Migrations
                     b.ToTable("Generos");
                 });
 
-            modelBuilder.Entity("net_api_peliculas.Entidades.Peliculas", b =>
+            modelBuilder.Entity("net_api_peliculas.Entidades.Pelicula", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -130,9 +130,6 @@ namespace net_api_peliculas.Migrations
                     b.Property<int>("Orden")
                         .HasColumnType("int");
 
-                    b.Property<int>("PeliculasId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Personaje")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -140,7 +137,7 @@ namespace net_api_peliculas.Migrations
 
                     b.HasKey("ActorId", "PeliculaId");
 
-                    b.HasIndex("PeliculasId");
+                    b.HasIndex("PeliculaId");
 
                     b.ToTable("PeliculasActores");
                 });
@@ -153,12 +150,9 @@ namespace net_api_peliculas.Migrations
                     b.Property<int>("PeliculaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PeliculasId")
-                        .HasColumnType("int");
-
                     b.HasKey("CineId", "PeliculaId");
 
-                    b.HasIndex("PeliculasId");
+                    b.HasIndex("PeliculaId");
 
                     b.ToTable("PeliculasCines");
                 });
@@ -171,12 +165,9 @@ namespace net_api_peliculas.Migrations
                     b.Property<int>("PeliculaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PeliculasId")
-                        .HasColumnType("int");
-
                     b.HasKey("GeneroId", "PeliculaId");
 
-                    b.HasIndex("PeliculasId");
+                    b.HasIndex("PeliculaId");
 
                     b.ToTable("PeliculasGeneros");
                 });
@@ -189,15 +180,15 @@ namespace net_api_peliculas.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("net_api_peliculas.Entidades.Peliculas", "Peliculas")
+                    b.HasOne("net_api_peliculas.Entidades.Pelicula", "Pelicula")
                         .WithMany("PeliculasActores")
-                        .HasForeignKey("PeliculasId")
+                        .HasForeignKey("PeliculaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Actor");
 
-                    b.Navigation("Peliculas");
+                    b.Navigation("Pelicula");
                 });
 
             modelBuilder.Entity("net_api_peliculas.Entidades.PeliculasCines", b =>
@@ -208,15 +199,15 @@ namespace net_api_peliculas.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("net_api_peliculas.Entidades.Peliculas", "Peliculas")
+                    b.HasOne("net_api_peliculas.Entidades.Pelicula", "Pelicula")
                         .WithMany("PeliculasCines")
-                        .HasForeignKey("PeliculasId")
+                        .HasForeignKey("PeliculaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cine");
 
-                    b.Navigation("Peliculas");
+                    b.Navigation("Pelicula");
                 });
 
             modelBuilder.Entity("net_api_peliculas.Entidades.PeliculasGeneros", b =>
@@ -227,18 +218,18 @@ namespace net_api_peliculas.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("net_api_peliculas.Entidades.Peliculas", "Peliculas")
+                    b.HasOne("net_api_peliculas.Entidades.Pelicula", "Pelicula")
                         .WithMany("PeliculasGeneros")
-                        .HasForeignKey("PeliculasId")
+                        .HasForeignKey("PeliculaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Genero");
 
-                    b.Navigation("Peliculas");
+                    b.Navigation("Pelicula");
                 });
 
-            modelBuilder.Entity("net_api_peliculas.Entidades.Peliculas", b =>
+            modelBuilder.Entity("net_api_peliculas.Entidades.Pelicula", b =>
                 {
                     b.Navigation("PeliculasActores");
 

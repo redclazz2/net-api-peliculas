@@ -45,7 +45,15 @@ namespace net_api_peliculas.Controllers
         [HttpGet("{id:int}", Name = "ObtenerActorPorId")]
         public async Task<ActionResult<ActorDTO>> Get(int id)
         {
-            return await Get <Actor,ActorDTO>(id);
+            return await Get<Actor, ActorDTO>(id);
+        }
+
+        [HttpGet("{nombre}")]
+        public async Task<ActionResult<List<PeliculaActorDTO>>> Get(string nombre)
+        {
+            return await context.Actores.Where(a => a.Nombre.Contains(nombre))
+            .ProjectTo<PeliculaActorDTO>(mapper.ConfigurationProvider)
+            .ToListAsync();
         }
 
         [HttpPost]

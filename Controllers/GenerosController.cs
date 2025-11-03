@@ -1,12 +1,8 @@
-using System.Threading.Tasks;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
-using Microsoft.EntityFrameworkCore;
 using net_api_peliculas.DTO;
 using net_api_peliculas.Entidades;
-using net_api_peliculas.Utilidades;
 
 namespace net_api_peliculas.Controllers
 {

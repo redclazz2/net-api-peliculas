@@ -1,16 +1,59 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using NetTopologySuite.Geometries;
 
 #nullable disable
 
 namespace net_api_peliculas.Migrations
 {
     /// <inheritdoc />
-    public partial class TablasPeliculas : Migration
+    public partial class InitialClean : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Actores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nombre = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    FechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Foto = table.Column<string>(type: "varchar(max)", unicode: false, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Actores", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Cines",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nombre = table.Column<string>(type: "nvarchar(75)", maxLength: 75, nullable: false),
+                    Ubicacion = table.Column<Point>(type: "geography", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cines", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Generos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nombre = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Generos", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Peliculas",
                 columns: table => new
@@ -34,8 +77,7 @@ namespace net_api_peliculas.Migrations
                     ActorId = table.Column<int>(type: "int", nullable: false),
                     PeliculaId = table.Column<int>(type: "int", nullable: false),
                     Personaje = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Orden = table.Column<int>(type: "int", nullable: false),
-                    PeliculasId = table.Column<int>(type: "int", nullable: false)
+                    Orden = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,8 +89,8 @@ namespace net_api_peliculas.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PeliculasActores_Peliculas_PeliculasId",
-                        column: x => x.PeliculasId,
+                        name: "FK_PeliculasActores_Peliculas_PeliculaId",
+                        column: x => x.PeliculaId,
                         principalTable: "Peliculas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -59,8 +101,7 @@ namespace net_api_peliculas.Migrations
                 columns: table => new
                 {
                     CineId = table.Column<int>(type: "int", nullable: false),
-                    PeliculaId = table.Column<int>(type: "int", nullable: false),
-                    PeliculasId = table.Column<int>(type: "int", nullable: false)
+                    PeliculaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -72,8 +113,8 @@ namespace net_api_peliculas.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PeliculasCines_Peliculas_PeliculasId",
-                        column: x => x.PeliculasId,
+                        name: "FK_PeliculasCines_Peliculas_PeliculaId",
+                        column: x => x.PeliculaId,
                         principalTable: "Peliculas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -84,8 +125,7 @@ namespace net_api_peliculas.Migrations
                 columns: table => new
                 {
                     GeneroId = table.Column<int>(type: "int", nullable: false),
-                    PeliculaId = table.Column<int>(type: "int", nullable: false),
-                    PeliculasId = table.Column<int>(type: "int", nullable: false)
+                    PeliculaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -97,27 +137,27 @@ namespace net_api_peliculas.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PeliculasGeneros_Peliculas_PeliculasId",
-                        column: x => x.PeliculasId,
+                        name: "FK_PeliculasGeneros_Peliculas_PeliculaId",
+                        column: x => x.PeliculaId,
                         principalTable: "Peliculas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PeliculasActores_PeliculasId",
+                name: "IX_PeliculasActores_PeliculaId",
                 table: "PeliculasActores",
-                column: "PeliculasId");
+                column: "PeliculaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PeliculasCines_PeliculasId",
+                name: "IX_PeliculasCines_PeliculaId",
                 table: "PeliculasCines",
-                column: "PeliculasId");
+                column: "PeliculaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PeliculasGeneros_PeliculasId",
+                name: "IX_PeliculasGeneros_PeliculaId",
                 table: "PeliculasGeneros",
-                column: "PeliculasId");
+                column: "PeliculaId");
         }
 
         /// <inheritdoc />
@@ -131,6 +171,15 @@ namespace net_api_peliculas.Migrations
 
             migrationBuilder.DropTable(
                 name: "PeliculasGeneros");
+
+            migrationBuilder.DropTable(
+                name: "Actores");
+
+            migrationBuilder.DropTable(
+                name: "Cines");
+
+            migrationBuilder.DropTable(
+                name: "Generos");
 
             migrationBuilder.DropTable(
                 name: "Peliculas");
