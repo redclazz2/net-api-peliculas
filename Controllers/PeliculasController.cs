@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using net_api_peliculas.DTO;
 using net_api_peliculas.Entidades;
 using net_api_peliculas.Servicios;
+using net_api_peliculas.Utilidades;
 
 namespace net_api_peliculas.Controllers
 {
@@ -171,6 +172,37 @@ namespace net_api_peliculas.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             return await Delete<Pelicula>(id);
+        }
+
+        [HttpGet("filtrar")]
+        public async Task<ActionResult<List<PeliculaDTO>>> Filtrar([FromQuery] PeliculasFiltrarDTO peliculasFiltrarDTO)
+        {
+            var peliculasQueryable = context.Peliculas.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(peliculasFiltrarDTO.Titulo))
+            {
+                peliculasQueryable = peliculasQueryable.Where(p => p.Titulo.Contains(peliculasFiltrarDTO.Titulo));
+            }
+
+            if (peliculasFiltrarDTO.EnCines)
+            {
+                peliculasQueryable = peliculasQueryable.Where(p => p.PeliculasCines.Select(pc => pc.PeliculaId).Contains(p.Id));
+            }
+
+            if (peliculasFiltrarDTO.ProximosEstrenos)
+            {
+                peliculasQueryable = peliculasQueryable.Where(p => p.FechaLanzamiento > DateTime.Today);
+            }
+
+            if (peliculasFiltrarDTO.GeneroId != 0)
+            {
+                peliculasQueryable = peliculasQueryable.Where(p => p.PeliculasGeneros.Select(pg => pg.GeneroId).Contains(peliculasFiltrarDTO.GeneroId));
+            }
+
+            await HttpContext.InsertarTotalRegistrosEnCabecera(peliculasQueryable);
+            var peliculas = await peliculasQueryable.Paginar(peliculasFiltrarDTO.Paginacion)
+                            .ProjectTo<PeliculaDTO>(mapper.ConfigurationProvider)
+                            .ToListAsync();
+            return peliculas;
         }
         
         private void AsignarOrdenActores(Pelicula peliculas)

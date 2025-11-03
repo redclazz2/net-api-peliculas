@@ -35,6 +35,15 @@ namespace net_api_peliculas.Controllers
             );
         }
 
+        [HttpGet("todos")]
+        [OutputCache(Tags = [cacheTag])]
+        public async Task<ActionResult<List<GeneroDTO>>> GetGeneros()
+        {
+            return await Get<Genero, GeneroDTO>(
+                orden: g => g.Nombre
+            );
+        }
+
         [HttpGet("{id}", Name = "ObtenerGeneroPorId")]
         public async Task<ActionResult<GeneroDTO>> GetGenero(int id)
         {

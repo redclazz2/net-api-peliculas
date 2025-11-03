@@ -44,6 +44,18 @@ namespace net_api_peliculas.Controllers
                 .ProjectTo<DTO>(mapper.ConfigurationProvider).ToListAsync();
         }
 
+        protected async Task<List<DTO>> Get<Entidad, DTO>(
+            Expression<Func<Entidad, object>> orden
+        )
+            where Entidad : class
+        {
+            var queryable = context.Set<Entidad>().AsQueryable();
+            await HttpContext.InsertarTotalRegistrosEnCabecera(queryable);
+            return await queryable
+                .OrderBy(orden)
+                .ProjectTo<DTO>(mapper.ConfigurationProvider).ToListAsync();
+        }
+
         protected async Task<ActionResult<DTO>> Get<Entidad, DTO>(int id)
             where Entidad : class, IId
             where DTO : IId
