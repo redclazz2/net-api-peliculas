@@ -11,7 +11,7 @@ namespace net_api_peliculas.Utilidades
         public async static Task InsertarTotalRegistrosEnCabecera<T>(this HttpContext httpContext, IQueryable<T> queryable){
             if (httpContext is null)
             {
-                throw new ArgumentException();
+                return;
             }
 
             double cantidad = await queryable.CountAsync();

@@ -31,7 +31,7 @@ namespace net_api_peliculas.Controllers
 
         [HttpGet]
         [OutputCache(Tags = [cacheTag])]
-        public async Task<ActionResult<List<GeneroDTO>>> GetGeneros([FromQuery] PaginacionDTO paginacion)
+        public async Task<List<GeneroDTO>> GetGeneros([FromQuery] PaginacionDTO paginacion)
         {
             return await Get<Genero, GeneroDTO>(
                 paginacion, orden: g => g.Nombre
@@ -41,7 +41,7 @@ namespace net_api_peliculas.Controllers
         [HttpGet("todos")]
         [OutputCache(Tags = [cacheTag])]
         [AllowAnonymous]
-        public async Task<ActionResult<List<GeneroDTO>>> GetGeneros()
+        public async Task<List<GeneroDTO>> GetTodosGeneros()
         {
             return await Get<Genero, GeneroDTO>(
                 orden: g => g.Nombre
