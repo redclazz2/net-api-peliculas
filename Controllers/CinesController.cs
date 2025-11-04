@@ -1,4 +1,6 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using net_api_peliculas.DTO;
@@ -8,6 +10,7 @@ namespace net_api_peliculas.Controllers
 {
     [Route("api/cines")]
     [ApiController]
+    [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme, Policy = "esadmin")]
     public class CinesController : CustomBaseController
     {
         private const string cacheTag = "cines";

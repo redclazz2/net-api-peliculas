@@ -1,17 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using net_api_peliculas.DTO;
 using net_api_peliculas.Utilidades;
@@ -20,6 +16,7 @@ namespace net_api_peliculas.Controllers
 {
     [Route("api/usuarios")]
     [ApiController]
+    [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme, Policy = "esadmin")]
     public class UsuariosController : ControllerBase
     {
         private readonly UserManager<IdentityUser> userManager;
@@ -42,6 +39,7 @@ namespace net_api_peliculas.Controllers
             this.context = context;
             this.mapper = mapper;
         }
+        
         [HttpGet("listadoUsuarios")]
         public async Task<ActionResult<List<UsuarioDTO>>> ListadoUsuarios([FromQuery] PaginacionDTO paginacionDTO)
         {
@@ -55,6 +53,7 @@ namespace net_api_peliculas.Controllers
         }
 
         [HttpPost("registrar")]
+        [AllowAnonymous]
         public async Task<ActionResult<RespuestaAutenticacionDTO>> Registrar(
             CredencialesUsuarioDTO credencialesUsuarioDTO
         )
@@ -80,6 +79,7 @@ namespace net_api_peliculas.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<ActionResult<RespuestaAutenticacionDTO>> Login(
             [FromBody] CredencialesUsuarioDTO credencialesUsuarioDTO
         )
@@ -107,6 +107,34 @@ namespace net_api_peliculas.Controllers
 
         //OPCIONAL: Hacer un metodo para obtener los errores con nombre de
         //identity!
+
+        [HttpPost("HacerAdmin")]
+        public async Task<IActionResult> HacerAdmin(EditarClaimDTO editarClaimDTO)
+        {
+            var usuario = await userManager.FindByEmailAsync(editarClaimDTO.Email);
+
+            if (usuario is null)
+            {
+                return NotFound();
+            }
+
+            await userManager.AddClaimAsync(usuario, new Claim("esadmin", "true"));
+            return NoContent();
+        }
+
+        [HttpPost("RemoverAdmin")]
+        public async Task<IActionResult> RemoverAdmin(EditarClaimDTO editarClaimDTO)
+        {
+            var usuario = await userManager.FindByEmailAsync(editarClaimDTO.Email);
+
+            if (usuario is null)
+            {
+                return NotFound();
+            }
+
+            await userManager.RemoveClaimAsync(usuario, new Claim("esadmin", "true"));
+            return NoContent();
+        }
 
         private async Task<RespuestaAutenticacionDTO> ConstruirToken(
             IdentityUser identityUser

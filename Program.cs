@@ -37,6 +37,12 @@ builder.Services.AddAuthentication().AddJwtBearer(opciones =>
     };
 });
 
+builder.Services.AddAuthorization(opciones =>
+{
+    //Nombre de la plitica, condicion para cumplirla
+    opciones.AddPolicy("esadmin", politica => politica.RequireClaim("esadmin"));
+});
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -46,7 +52,6 @@ var allowedOrigins = builder.Configuration.GetValue<string>("AllowedOrigins")!.S
 
 builder.Services.AddTransient<IAlmacenadorArchivos, AlmacenadorLocal>();
 builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddCors(opciones =>
 {
     opciones.AddDefaultPolicy(opcionesCORS =>
@@ -79,15 +84,16 @@ builder.Services.AddSingleton(proveedor => new MapperConfiguration(configuration
     var geometryFactory = proveedor.GetRequiredService<GeometryFactory>();
     configuration.AddProfile(new AutoMapperProfiles(geometryFactory));
 }).CreateMapper());
+builder.Services.AddTransient<IServicioUsuarios, ServicioUsuarios>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.UseHttpsRedirection();
 

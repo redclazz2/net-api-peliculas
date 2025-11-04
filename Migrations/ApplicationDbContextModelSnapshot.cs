@@ -367,6 +367,33 @@ namespace net_api_peliculas.Migrations
                     b.ToTable("PeliculasGeneros");
                 });
 
+            modelBuilder.Entity("net_api_peliculas.Entidades.Rating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PeliculaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Puntuacion")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PeliculaId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("RatingsPeliculas");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -473,6 +500,25 @@ namespace net_api_peliculas.Migrations
                     b.Navigation("Genero");
 
                     b.Navigation("Pelicula");
+                });
+
+            modelBuilder.Entity("net_api_peliculas.Entidades.Rating", b =>
+                {
+                    b.HasOne("net_api_peliculas.Entidades.Pelicula", "Pelicula")
+                        .WithMany()
+                        .HasForeignKey("PeliculaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pelicula");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("net_api_peliculas.Entidades.Pelicula", b =>

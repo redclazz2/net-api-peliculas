@@ -1,5 +1,7 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,7 @@ using net_api_peliculas.Utilidades;
 namespace net_api_peliculas.Controllers
 {
     [Route("api/actores")]
+    [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme, Policy = "esadmin")]
     public class ActoresController : CustomBaseController
     {
         private readonly ApplicationDbContext context;
