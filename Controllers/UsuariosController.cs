@@ -1,0 +1,149 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using net_api_peliculas.DTO;
+using net_api_peliculas.Utilidades;
+
+namespace net_api_peliculas.Controllers
+{
+    [Route("api/usuarios")]
+    [ApiController]
+    public class UsuariosController : ControllerBase
+    {
+        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly IConfiguration configuration;
+        private readonly ApplicationDbContext context;
+        private readonly IMapper mapper;
+
+        public UsuariosController(
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            IConfiguration configuration,
+            ApplicationDbContext context,
+            IMapper mapper
+        )
+        {
+            this.userManager = userManager;
+            this.signInManager = signInManager;
+            this.configuration = configuration;
+            this.context = context;
+            this.mapper = mapper;
+        }
+        [HttpGet("listadoUsuarios")]
+        public async Task<ActionResult<List<UsuarioDTO>>> ListadoUsuarios([FromQuery] PaginacionDTO paginacionDTO)
+        {
+            var queryable = context.Users.AsQueryable();
+
+            await HttpContext.InsertarTotalRegistrosEnCabecera(queryable);
+            var usuarios = await queryable.ProjectTo<UsuarioDTO>(mapper.ConfigurationProvider)
+            .OrderBy(x => x.Email).Paginar(paginacionDTO).ToListAsync();
+
+            return usuarios;
+        }
+
+        [HttpPost("registrar")]
+        public async Task<ActionResult<RespuestaAutenticacionDTO>> Registrar(
+            CredencialesUsuarioDTO credencialesUsuarioDTO
+        )
+        {
+            var usuario = new IdentityUser
+            {
+                Email = credencialesUsuarioDTO.Email,
+                UserName = credencialesUsuarioDTO.Email,
+            };
+
+            var resultado = await userManager.CreateAsync(
+                usuario, credencialesUsuarioDTO.Password
+            );
+
+            if (resultado.Succeeded)
+            {
+                return await ConstruirToken(usuario);
+            }
+            else
+            {
+                return BadRequest(resultado.Errors);
+            }
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<RespuestaAutenticacionDTO>> Login(
+            [FromBody] CredencialesUsuarioDTO credencialesUsuarioDTO
+        )
+        {
+            var usuario = await userManager.FindByEmailAsync(credencialesUsuarioDTO.Email);
+            if (usuario is null)
+            {
+                return BadRequest("Error de registro");
+            }
+            ;
+
+            var resultado = await signInManager.CheckPasswordSignInAsync(
+                usuario, credencialesUsuarioDTO.Password, lockoutOnFailure: false
+            );
+
+            if (resultado.Succeeded)
+            {
+                return await ConstruirToken(usuario);
+            }
+            else
+            {
+                return BadRequest("Error de login");
+            }
+        }
+
+        //OPCIONAL: Hacer un metodo para obtener los errores con nombre de
+        //identity!
+
+        private async Task<RespuestaAutenticacionDTO> ConstruirToken(
+            IdentityUser identityUser
+        )
+        {
+            var claims = new List<Claim>()
+            {
+                new Claim("email",identityUser.Email!),
+            };
+
+            var claimsDB = await userManager.GetClaimsAsync(identityUser);
+
+            claims.AddRange(claimsDB);
+
+            var llave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                configuration["llavejwt"]!
+            ));
+
+            var creds = new SigningCredentials(llave, SecurityAlgorithms.HmacSha256);
+            var expiracion = DateTime.UtcNow.AddYears(1);
+
+            var token = new JwtSecurityToken(
+                issuer: null,
+                audience: null,
+                claims: claims,
+                expires: expiracion,
+                signingCredentials: creds
+            );
+
+            var tokenFinal = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return new RespuestaAutenticacionDTO
+            {
+                Token = tokenFinal,
+                Expiracion = expiracion
+            };
+        }
+    }
+
+}

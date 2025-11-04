@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using net_api_peliculas.DTO;
 using net_api_peliculas.Entidades;
 using NetTopologySuite.Geometries;
@@ -15,6 +16,9 @@ namespace net_api_peliculas.Utilidades
             ConfigActores();
             ConfigCines(geometryFactory);
             ConfigPeliculas();
+
+            CreateMap<IdentityUser, UsuarioDTO>();
+
         }
 
         private void ConfigGeneros()
